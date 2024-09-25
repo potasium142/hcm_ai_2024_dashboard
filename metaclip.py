@@ -1,14 +1,14 @@
-from longclip.model import longclip
+import open_clip
+
 import numpy as np
 import torch
 
 
-class LongCLIPModel():
+class MetaCLIP():
     def __init__(self,
-                 ckpt_path: str,
                  device: str = "cpu") -> None:
         self.device = self.__get_device(device)
-        self.ckpt = self.__eval_model(ckpt_path)
+        self.model, self.tokenizer = self.__eval_model()
 
     def __get_device(self,
                      device: str):
@@ -24,20 +24,24 @@ class LongCLIPModel():
             case "_":
                 raise Exception(f"Unknow device:{device}")
 
-    def __eval_model(self,
-                     path: str):
-        model, _ = longclip.load(path, device=self.device)
+    def __eval_model(self):
+        model_name = "ViT-L-14-quickgelu"
+        model, _, _ = open_clip.create_model_and_transforms(
+            model_name,
+            pretrained="metaclip_fullcc",
+            device=self.device
+        )
         model.eval()
-        return model
+
+        tokenizer = open_clip.get_tokenizer(model_name)
+        return model, tokenizer
 
     def encode_text(self,
                     search_text: str | list[str]) -> np.ndarray:
-        text_tokens = longclip\
-            .tokenize(search_text)\
-            .to(self.device)
+        text_tokens = self.tokenizer(search_text)
 
         with torch.no_grad():
-            text_features = self.ckpt\
+            text_features = self.model\
                 .encode_text(text_tokens)\
                 .float()
 

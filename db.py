@@ -10,25 +10,39 @@ class DB():
         self.faiss_db = faiss.read_index(faiss_db_path)
         self.frame_index = np.load(frame_index_path)
 
+    def __map_result(self,
+                     x):
+        return x[0], self.frame_index[x[1]]
+
     def query(self,
               query: np.ndarray,
               k: int = 100):
-        _, indices = self.faiss_db.search(query, k)
+        conf, indices = self.faiss_db.search(query, k)
 
+        conf = (conf*100).astype(int)
+
+        results = np.stack((conf, indices), axis=2)
         return Result(
-            list(
+            [list(
                 map(
-                    lambda x: self.frame_index[x],
-                    indices
+                    self.__map_result,
+                    result
                 )
-            )
+            ) for result in results]
         )
 
 
 class VideoMetadata():
     def __init__(self,
-                 metadata_path: str) -> None:
+                 metadata_path: str,
+                 frame_index_path: str) -> None:
         self.metadata = self.__open_metadata(metadata_path)
+        self.frame_index = self.__load_frame_index(frame_index_path)
+
+    def __load_frame_index(self,
+                           frame_index_path: str) -> list:
+        with open(frame_index_path, "rb") as f:
+            return pickle.load(f)
 
     def __open_metadata(self,
                         path) -> dict:
@@ -51,59 +65,23 @@ class VideoMetadata():
 class Result():
     def __init__(self,
                  results: list):
-        self.results = results
+        self.results = self.__decode_list(results)
 
     def __decode(self,
-                 index_compact):
+                 entry):
+        conf = entry[0]
+        index_compact = entry[1]
         index, frame = divmod(index_compact, 1000000)
         index, video = divmod(index, 1000)
         index, folder = divmod(index, 100)
 
-        return [index, folder, video, frame]
+        return [conf, index, folder, video, frame]
 
-    def __decode_path(self,
-                      index_compact):
-        d = self.__decode(index_compact)
-
-        return [
-            d[0],
-            f"Videos_L{d[1]:02d}_a/L{d[1]:02d}_V{d[2]:03d}/{d[3]:06d}.jpg"
-        ]
-
-    def decode(self) -> list:
-        return [list(
+    def __decode_list(self,
+                      results):
+        return np.concatenate([list(
             map(
                 self.__decode,
                 indice
             )
-        ) for indice in self.results]
-
-    def get_path_list(self) -> list:
-        return [list(
-            map(
-                self.__decode_path,
-                indice
-            )
-        ) for indice in self.results]
-
-    # SHIT FUCKING STINK -- TODO: burn this
-    def group_output(self):
-        gr = dict()
-
-        for r in self.results:
-            for f in r:
-                d = self.__decode(f)
-
-                index = d[1].item() * 1000 + d[2].item()
-
-                vid_bin = gr.get(index, set())
-
-                vid_bin.add(d[3].item())
-
-                gr[index] = vid_bin
-
-        return sorted(
-            gr.items(),
-            key=lambda x: len(x[1]),
-            reverse=True
-        )
+        ) for indice in results])

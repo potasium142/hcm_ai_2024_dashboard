@@ -1,5 +1,8 @@
+import nltk
 from nltk.tokenize import sent_tokenize
 from googletrans import Translator
+
+# nltk.download('punkt_tab')
 
 
 class Prompt():
