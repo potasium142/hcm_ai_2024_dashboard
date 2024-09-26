@@ -1,4 +1,3 @@
-import PIL.Image
 import streamlit as st
 import PIL
 
@@ -10,6 +9,7 @@ def display_image(
         time,
         url,
         popup_callback,
+        kidx
 ):
     container = st.container(border=True)
     with container:
@@ -18,20 +18,20 @@ def display_image(
             image=path,
             use_column_width=True
         )
-        st.link_button(
-            label=f"Conf {f[0]}% Time {m}:{s:02d}",
-            use_container_width=True,
-            url=url
-        )
+        # st.link_button(
+        #     label=f"Conf {f[0]}% Time {m}:{s:02d}",
+        #     use_container_width=True,
+        #     url=url
+        # )
         st.code(
             f"{video_id}, {f[4]}",
             language="markdown"
         )
         # dialog window brokie rn
-        # st.button(
-        #     label="Watch",
-        #     use_container_width=True,
-        #     on_click=popup_callback,
-        #     args=(url,), key=url
-        # )
+        st.button(
+            label=f"Conf {f[0]}% Time {m}:{s:02d}",
+            use_container_width=True,
+            on_click=popup_callback,
+            args=(url, time), key=kidx
+        )
     return container

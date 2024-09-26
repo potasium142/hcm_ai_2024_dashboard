@@ -4,11 +4,13 @@ import numpy as np
 import torch
 
 
-class MetaCLIP():
+class OpenCLIP():
     def __init__(self,
+                 model_name: str,
+                 pretrained: str,
                  device: str = "cpu") -> None:
         self.device = self.__get_device(device)
-        self.model, self.tokenizer = self.__eval_model()
+        self.model, self.tokenizer = self.__eval_model(model_name, pretrained)
 
     def __get_device(self,
                      device: str):
@@ -24,11 +26,12 @@ class MetaCLIP():
             case "_":
                 raise Exception(f"Unknow device:{device}")
 
-    def __eval_model(self):
-        model_name = "ViT-L-14-quickgelu"
+    def __eval_model(self,
+                     model_name: str,
+                     pretrained: str,):
         model, _, _ = open_clip.create_model_and_transforms(
             model_name,
-            pretrained="metaclip_fullcc",
+            pretrained=pretrained,
             device=self.device
         )
         model.eval()

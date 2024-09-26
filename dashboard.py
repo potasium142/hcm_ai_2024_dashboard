@@ -1,5 +1,5 @@
 import streamlit as st
-import clip
+import longclip_model
 import dash.sidebar.output
 import dash.sidebar.query
 import dash.output
@@ -7,8 +7,9 @@ import db
 import googletrans
 import dash
 import query_result as qr
-import metaclip
+import openclip_model
 import numpy as np
+import pandas as pd
 
 st.set_page_config(
     page_title="Video search dashboard",
@@ -18,11 +19,24 @@ st.set_page_config(
 
 ss = st.session_state
 
+
+def create_answer_table():
+    ss["answer_table"] = pd.DataFrame(
+        columns=["Video", "Index"]
+    )
+
+    ss["answer_table_final"] = pd.DataFrame(
+        columns=["Video", "Frames"]
+    )
+
+
 if "query_result" not in ss:
     ss["query_result"] = None
+    ss["result"] = []
+
 
 if "answer_table" not in ss:
-    ss["answer_table"] = set()
+    create_answer_table()
 
 if "max_result" not in ss:
     ss["max_result"] = 100
@@ -33,23 +47,27 @@ keyframes_dir = "./keyframes"
 
 @st.cache_resource
 def init_longclip(show_spinner=True):
-    longclip_model = clip.LongCLIPModel("./ckpt/longclip-L.pt", "cpu")
+    model = longclip_model.LongCLIPModel(
+        "./ckpt/longclip-L.pt", "cpu")
 
     db_longclip = db.DB(
         "./db/faiss_LongCLIP.bin",
-        "./db/index_compact.npy"
+        "./db/index_compact_2.npy"
     )
-    return longclip_model, db_longclip
+    return model, db_longclip
 
 
 @st.cache_resource
 def init_metaclip(show_spinner=True):
-    metaclip_model = metaclip.MetaCLIP("cpu")
+    model = openclip_model.OpenCLIP(
+        "ViT-L-14-quickgelu",
+        "metaclip_fullcc"
+    )
     db_metaclip = db.DB(
         "./db/faiss_MetaCLIP.bin",
-        "./db/index_compact.npy"
+        "./db/index_compact_2.npy"
     )
-    return metaclip_model, db_metaclip
+    return model, db_metaclip
 
 
 @st.cache_resource
@@ -65,7 +83,9 @@ def init_miscelleneous(show_spinner=True):
 
 
 translator, metadata = init_miscelleneous()
+
 longclip_model, db_longclip = init_longclip()
+
 metaclip_model, db_metaclip = init_metaclip()
 
 
@@ -78,7 +98,7 @@ def search():
             db_longclip.query(
                 longclip_token,
                 ss["max_result"]
-            ).results
+            )
         )
 
     if ss["query_metaclip"]:
@@ -87,43 +107,45 @@ def search():
             db_metaclip.query(
                 metaclip_token,
                 ss["max_result"]
-            ).results
+            )
         )
 
     ss["query_result"] = np.concatenate(results)
+    dash.sidebar.output.update(ss, metadata)
 
 
 with st.sidebar:
-    tabs = st.tabs(["Query", "Output"])
+    tabs = st.tabs(["Query", "Output", "Table"])
     with tabs[0]:
         dash.sidebar.query.gadget(ss, translator, search)
     with tabs[1]:
-        dash.sidebar.output.gadget(ss)
+        dash.sidebar.output.gadget(ss, metadata)
+    # with tabs[2]:
+    #     st.button(
+    #         "Reset table",
+    #         on_click=create_answer_table
+    #     )
+    #     st.download_button(
+    #         label="Download data as CSV",
+    #         data=ss["answer_table_final"].to_csv(
+    #             header=False,
+    #             index=False
+    #         ),
+    #         mime="text/csv",
+    #     )
+    #     ss["answer_table_final"] = st.data_editor(
+    #         ss["answer_table"],
+    #         use_container_width=True,
+    #         num_rows="dynamic"
+    #     )
+
 
 results_container = st.container()
 
-if ss["query_result"] is not None:
-    with results_container:
-        result = ss["query_result"]
-
-        if ss["fetch_nearby"] != 0:
-            result = qr.get_nearby(
-                result,
-                ss["fetch_nearby"],
-                metadata.frame_index
-            )
-
-        match ss["group_input"]:
-            case None:
-                result = [["", result]]
-            case "Confident":
-                result = qr.group_by_conf(result)
-            case "Video":
-                result = qr.group_by_video(result)
-
-        dash.output.show_result(
-            result,
-            metadata,
-            keyframes_dir,
-            ss["display_columns"]
-        )
+dash.output.show_result(
+    ss["result"],
+    results_container,
+    metadata,
+    keyframes_dir,
+    ss["display_columns"]
+)

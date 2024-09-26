@@ -12,24 +12,23 @@ class DB():
 
     def __map_result(self,
                      x):
-        return x[0], self.frame_index[x[1]]
+        return self.frame_index[x]
 
     def query(self,
               query: np.ndarray,
               k: int = 100):
         conf, indices = self.faiss_db.search(query, k)
 
-        conf = (conf*100).astype(int)
+        frames_data = np.array(list(
+            map(
+                self.__map_result,
+                indices.flatten()
+            )
+        ))
 
-        results = np.stack((conf, indices), axis=2)
-        return Result(
-            [list(
-                map(
-                    self.__map_result,
-                    result
-                )
-            ) for result in results]
-        )
+        frames_data[:, 0] = (conf.flatten() * 100).astype(int)
+
+        return frames_data
 
 
 class VideoMetadata():
@@ -60,28 +59,3 @@ class VideoMetadata():
     def get_by_name(self,
                     i: str) -> list:
         return self.metadata.get(i)
-
-
-class Result():
-    def __init__(self,
-                 results: list):
-        self.results = self.__decode_list(results)
-
-    def __decode(self,
-                 entry):
-        conf = entry[0]
-        index_compact = entry[1]
-        index, frame = divmod(index_compact, 1000000)
-        index, video = divmod(index, 1000)
-        index, folder = divmod(index, 100)
-
-        return [conf, index, folder, video, frame]
-
-    def __decode_list(self,
-                      results):
-        return np.concatenate([list(
-            map(
-                self.__decode,
-                indice
-            )
-        ) for indice in results])

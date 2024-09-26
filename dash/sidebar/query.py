@@ -2,11 +2,10 @@ import streamlit as st
 from prompt import Prompt
 
 
+@st.fragment
 def gadget(ss,
            translator,
            search):
-    # sidebar = st.sidebar
-    # with sidebar:
 
     prompt_input = st.text_area("Prompt")
 
@@ -32,7 +31,7 @@ def gadget(ss,
 
         ss["query_metaclip"] = st.toggle(
             "META CLIP",
-            value=True
+            value=False
         )
 
     ss["prompt"] = Prompt(text=prompt_input, translator=translator)
@@ -67,8 +66,9 @@ def gadget(ss,
         min_value=1,
         max_value=1000
     )
-    st.button(
+    if st.button(
         label="search",
         on_click=search,
         use_container_width=True
-    )
+    ):
+        st.rerun()

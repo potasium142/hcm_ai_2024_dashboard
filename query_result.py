@@ -38,7 +38,6 @@ def group_by_conf(results) -> dict:
 def get_nearby(results,
                k,
                frame_index_list):
-
     output = list()
     # for result in results:
 
@@ -59,5 +58,4 @@ def get_nearby(results,
             except:
                 pass
     # output.append(near_frames_list)
-
     return output
