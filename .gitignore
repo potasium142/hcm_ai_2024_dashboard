@@ -1,5 +1,5 @@
 __pycache__
-ckpt
-db
-keyframes
-metadata
+ckpt/*
+db/*
+keyframes/*
+metadata/*
