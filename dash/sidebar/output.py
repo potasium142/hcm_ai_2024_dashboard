@@ -20,7 +20,7 @@ def update(ss, metadata):
         case "Video":
             result = qr.group_by_video(result)
 
-    ss["result"] = result
+    ss["result"] = qr.paging(result, ss["image_per_page"])
 
 
 @st.fragment
@@ -40,6 +40,12 @@ def gadget(ss, metadata):
         value=3,
         min_value=1,
         max_value=8
+    )
+    ss["image_per_page"] = st.slider(
+        "Image per page",
+        value=100,
+        min_value=1,
+        max_value=200
     )
     if st.button(
         label="Update",

@@ -1,4 +1,5 @@
 import streamlit as st
+import dash.sidebar.paging
 import longclip_model
 import dash.sidebar.output
 import dash.sidebar.query
@@ -32,7 +33,8 @@ def create_answer_table():
 
 if "query_result" not in ss:
     ss["query_result"] = None
-    ss["result"] = []
+    ss["result"] = [[]]
+    ss["page_num"] = 0
 
 
 if "answer_table" not in ss:
@@ -115,12 +117,15 @@ def search():
 
 
 with st.sidebar:
+    dash.sidebar.paging.paging()
+
     tabs = st.tabs(["Query", "Output", "Table"])
     with tabs[0]:
         dash.sidebar.query.gadget(ss, translator, search)
     with tabs[1]:
         dash.sidebar.output.gadget(ss, metadata)
-    # with tabs[2]:
+    with tabs[2]:
+        st.write("vo dc vong sau r lam")
     #     st.button(
     #         "Reset table",
     #         on_click=create_answer_table
@@ -142,8 +147,11 @@ with st.sidebar:
 
 results_container = st.container()
 
+# with results_container:
+#     ss["result"]
+
 dash.output.show_result(
-    ss["result"],
+    ss["result"][ss["page_num"]],
     results_container,
     metadata,
     keyframes_dir,
