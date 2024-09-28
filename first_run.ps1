@@ -12,4 +12,4 @@ git submodule update --init --recursive
 
 # Install nltk
 Write-Host "Install nltk"
-python -c "import nltk; nltk.download('punkt')"
+python -c "import nltk; nltk.download('punkt_tab')"
