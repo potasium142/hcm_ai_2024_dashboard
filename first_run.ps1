@@ -3,6 +3,7 @@
 # Install pip packages
 Write-Host "Install pip packages"
 pip install -r requirements.txt --progress-bar on -q
+pip install torch torchvision torchaudio
 
 # Download LongCLIP
 Write-Host "Download LongCLIP"

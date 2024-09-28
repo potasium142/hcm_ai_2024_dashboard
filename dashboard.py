@@ -117,7 +117,10 @@ def search():
 
 
 with st.sidebar:
-    dash.sidebar.paging.paging()
+    if len(ss["result"]) > 1:
+        dash.sidebar.paging.paging()
+    else:
+        ss["page_num"] = 0
 
     tabs = st.tabs(["Query", "Output", "Table"])
     with tabs[0]:
@@ -147,8 +150,8 @@ with st.sidebar:
 
 results_container = st.container()
 
-# with results_container:
-#     ss["result"]
+
+ss["page_num"] = max(0, ss["page_num"])
 
 dash.output.show_result(
     ss["result"][ss["page_num"]],

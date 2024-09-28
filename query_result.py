@@ -69,12 +69,13 @@ def paging(results, k):
 
         remain_size = k - i
 
-        if bin_size < remain_size:
+        if bin_size <= remain_size:
             i = i+bin_size
             f_page.append([b[0], f])
             continue
 
         f_page.append([b[0], f[:remain_size]])
+
         output.append(f_page)
         f_page = []
 
@@ -86,9 +87,13 @@ def paging(results, k):
             start_range = i + k*(j)
             end_range = i+k*(j+1)
             f_page.append([b[0], new_bin[start_range: end_range]])
+
             output.append(f_page)
             f_page = []
 
         i = i_a
+
+    if len(f_page) > 0:
+        output.append(f_page)
 
     return output
