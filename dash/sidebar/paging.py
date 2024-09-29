@@ -11,7 +11,6 @@ def change_page(change):
 
 
 def paging():
-
     ss["page_num"] = st.slider(
         label="Page",
         value=ss["page_num"],
