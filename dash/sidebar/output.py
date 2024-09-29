@@ -4,7 +4,7 @@ import query_result as qr
 
 def update(ss, metadata):
     result = ss["query_result"]
-
+    ss["page_num"] = 0
     if ss["fetch_nearby"] != 0:
         result = qr.get_nearby(
             result,

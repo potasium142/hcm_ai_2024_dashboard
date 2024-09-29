@@ -69,7 +69,7 @@ def paging(results, k):
 
         remain_size = k - i
 
-        if bin_size <= remain_size:
+        if bin_size < remain_size:
             i = i+bin_size
             f_page.append([b[0], f])
             continue

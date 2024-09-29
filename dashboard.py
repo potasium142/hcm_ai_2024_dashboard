@@ -173,9 +173,10 @@ with st.sidebar:
 
 
 results_container = st.container()
+# with results_container:
+#     ss["result"][ss["page_num"]]
 
-
-ss["page_num"] = max(0, ss["page_num"])
+# ss["page_num"] = max(0, ss["page_num"])
 
 dash.output.show_result(
     ss["result"][ss["page_num"]],
