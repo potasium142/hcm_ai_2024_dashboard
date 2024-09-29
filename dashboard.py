@@ -60,32 +60,6 @@ def init_longclip(show_spinner=True):
 
 
 @st.cache_resource
-def init_metaclip(show_spinner=True):
-    model = openclip_model.OpenCLIP(
-        "ViT-L-14-quickgelu",
-        "metaclip_fullcc"
-    )
-    db_metaclip = db.DB(
-        "./db/faiss_MetaCLIP.bin",
-        "./db/index_compact_2.npy"
-    )
-    return model, db_metaclip
-
-
-@st.cache_resource
-def init_openclip(show_spinner=True):
-    model = openclip_model.OpenCLIP(
-        "ViT-H-14-quickgelu",
-        "dfn5b"
-    )
-    db_metaclip = db.DB(
-        "./db/faiss_openCLIP.bin",
-        "./db/index_compact_2.npy"
-    )
-    return model, db_metaclip
-
-
-@st.cache_resource
 def init_miscelleneous(show_spinner=True):
 
     translator = googletrans.Translator()
@@ -101,10 +75,6 @@ translator, metadata = init_miscelleneous()
 
 longclip_model, db_longclip = init_longclip()
 
-metaclip_model, db_metaclip = init_metaclip()
-
-openclip_model, db_openclip = init_openclip()
-
 
 def search():
     texts = ss["search_query"]
@@ -114,24 +84,6 @@ def search():
         results.append(
             db_longclip.query(
                 longclip_token,
-                ss["max_result"]
-            )
-        )
-
-    if ss["query_metaclip"]:
-        metaclip_token = metaclip_model.encode_text(texts)
-        results.append(
-            db_metaclip.query(
-                metaclip_token,
-                ss["max_result"]
-            )
-        )
-
-    if ss["query_openclip"]:
-        openclip_token = openclip_model.encode_text(texts)
-        results.append(
-            db_openclip.query(
-                openclip_token,
                 ss["max_result"]
             )
         )
