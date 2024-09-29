@@ -34,6 +34,11 @@ def gadget(ss,
             value=False
         )
 
+        ss["query_openclip"] = st.toggle(
+            "OPENCLIP",
+            value=False
+        )
+
     ss["prompt"] = Prompt(text=prompt_input, translator=translator)
 
     if translate_prompt:
