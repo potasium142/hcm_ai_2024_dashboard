@@ -5,41 +5,28 @@ import pickle
 
 class DB():
     def __init__(self,
-                 faiss_db_path: str,
-                 frame_index_path: str) -> None:
+                 faiss_db_path: str) -> None:
         self.faiss_db = faiss.read_index(faiss_db_path)
-        self.frame_index = np.load(frame_index_path)
-
-    def __map_result(self,
-                     x):
-        return self.frame_index[x]
 
     def query(self,
               query: np.ndarray,
-              k: int = 100):
-        conf, indices = self.faiss_db.search(query, k)
+              k: int = 100) -> tuple[np.ndarray, np.ndarray]:
+        _, indices = self.faiss_db.search(query, k)
 
-        frames_data = np.array(list(
-            map(
-                self.__map_result,
-                indices.flatten()
-            )
-        ))
-
-        frames_data[:, 0] = (conf.flatten() * 100).astype(int)
-
-        return frames_data
+        return indices.flatten()
 
 
 class VideoMetadata():
     def __init__(self,
                  metadata_path: str,
+                 nearby_index_path: str,
                  frame_index_path: str) -> None:
         self.metadata = self.__open_metadata(metadata_path)
+        self.nearby_index = self.__load_nearby_index(nearby_index_path)
         self.frame_index = self.__load_frame_index(frame_index_path)
 
-    def __load_frame_index(self,
-                           frame_index_path: str) -> list:
+    def __load_nearby_index(self,
+                            frame_index_path: str) -> list:
         with open(frame_index_path, "rb") as f:
             return pickle.load(f)
 
@@ -49,6 +36,19 @@ class VideoMetadata():
             path,
             allow_pickle=True
         ).item()
+
+    def map_indices(self,
+                    indices_list: np.ndarray) -> list:
+        return list(
+            map(
+                lambda i: self.frame_index[i],
+                indices_list
+            )
+        )
+
+    def __load_frame_index(self,
+                           path) -> np.ndarray:
+        return np.load(path)
 
     def get_by_index(self,
                      batch: int,

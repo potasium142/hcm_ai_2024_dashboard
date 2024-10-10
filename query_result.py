@@ -19,7 +19,12 @@ def group_by_video(results):
     )
 
 
-def group_by_conf(results) -> dict:
+def group_occurence(indices: np.ndarray
+                    ) -> tuple[np.ndarray, np.ndarray]:
+    return np.unique(indices, return_counts=True)
+
+
+def group_by_occurence(results) -> dict:
     conf_bin = dict()
 
     # for result in results:

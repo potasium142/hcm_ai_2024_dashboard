@@ -1,9 +1,17 @@
 import streamlit as st
 import query_result as qr
+import numpy as np
+from db import VideoMetadata
 
 
-def update(ss, metadata):
+def update(ss, metadata: VideoMetadata):
     result = ss["query_result"]
+    frame_result, count = qr.group_occurence(result)
+
+    result = np.array(metadata.map_indices(frame_result))
+    st.write(result)
+    result[:, 0] = count.astype(int)
+
     ss["page_num"] = 0
     if ss["fetch_nearby"] != 0:
         result = qr.get_nearby(
@@ -16,7 +24,7 @@ def update(ss, metadata):
         case None:
             result = [["", result]]
         case "Confident":
-            result = qr.group_by_conf(result)
+            result = qr.group_by_occurence(result)
         case "Video":
             result = qr.group_by_video(result)
 

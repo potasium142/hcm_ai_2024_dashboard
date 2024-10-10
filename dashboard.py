@@ -54,7 +54,6 @@ def init_longclip(show_spinner=True):
 
     db_longclip = db.DB(
         "./db/faiss_LongCLIP.bin",
-        "./db/index_compact_2.npy"
     )
     return model, db_longclip
 
@@ -67,7 +66,6 @@ def init_metaclip(show_spinner=True):
     )
     db_metaclip = db.DB(
         "./db/faiss_MetaCLIP.bin",
-        "./db/index_compact_2.npy"
     )
     return model, db_metaclip
 
@@ -80,7 +78,6 @@ def init_openclip(show_spinner=True):
     )
     db_metaclip = db.DB(
         "./db/faiss_openCLIP.bin",
-        "./db/index_compact_2.npy"
     )
     return model, db_metaclip
 
@@ -91,7 +88,8 @@ def init_miscelleneous(show_spinner=True):
     translator = googletrans.Translator()
     video_metadata = db.VideoMetadata(
         "./db/video_metadata.npy",
-        "./db/index_frame.pkl"
+        "./db/index_frame.pkl",
+        "./db/index_compact_2.npy"
     )
 
     return translator, video_metadata
