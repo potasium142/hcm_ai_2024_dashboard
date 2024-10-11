@@ -1,37 +1,84 @@
 import streamlit as st
-import PIL
+
+YOUTUBE_URL = f"https://youtu.be"
+
+ss = st.session_state
 
 
-def display_image(
+def display_image_full(
         f,
-        video_id,
-        path,
-        time,
-        url,
-        popup_callback,
-        kidx
+        metadata,
+        youtube_popup_callback,
+        nearby_popup_callback,
+        kidx,
 ):
+    vid_name = f"L{f[2]:02d}_V{f[3]:03d}"
+    set_name = f"Videos_L{f[2]:02d}_a"
+
+    fps, youtube_id = metadata.get_by_name(vid_name)
+
+    time = int(f[4]/fps)
+    url = f"{YOUTUBE_URL}/{youtube_id}"
+
+    path = f"{ss['kf_dir']}/{set_name}/{vid_name}/{f[4]:06d}.jpg"
     container = st.container(border=True)
     with container:
         m, s = divmod(time, 60)
+
+        st.caption(
+            f"Occurence {f[0]} - Time {m}:{s:02d}",
+        )
+
         st.image(
             image=path,
             use_column_width=True
         )
-        # st.link_button(
-        #     label=f"Conf {f[0]}% Time {m}:{s:02d}",
-        #     use_container_width=True,
-        #     url=url
-        # )
+
         st.code(
-            f"{video_id}, {f[4]}",
+            f"{vid_name}, {f[4]}",
             language="markdown"
         )
-        # dialog window brokie rn
-        st.button(
-            label=f"Conf {f[0]}% Time {m}:{s:02d}",
+
+        cols = st.columns(2)
+        cols[0].button(
+            label="YouTube Video",
             use_container_width=True,
-            on_click=popup_callback,
-            args=(url, time), key=kidx
+            on_click=youtube_popup_callback,
+            args=(url, time), key=f"{kidx}0"
+        )
+        cols[1].button(
+            label="Show nearby",
+            use_container_width=True,
+            on_click=nearby_popup_callback,
+            args=(f, metadata, set_name, vid_name, fps),
+            key=f"{kidx}1"
         )
     return container
+
+
+def display_img_nearby(
+        f,
+        fps,
+        set_name,
+        vid_name,
+):
+    with st.container(border=True):
+        time = int(f[4]/fps)
+        m, s = divmod(time, 60)
+
+        path = f"{ss['kf_dir']}/{set_name}/{vid_name}/{f[4]:06d}.jpg"
+
+        st.caption(
+            f"Occurence {f[0]} - Time {m}:{s:02d}",
+        )
+
+        st.image(
+            image=path,
+            use_column_width=True
+        )
+
+        st.code(
+            f"{vid_name}, {f[4]}",
+            language="markdown"
+        )
+    pass

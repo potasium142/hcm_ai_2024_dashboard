@@ -5,26 +5,26 @@ from db import VideoMetadata
 
 
 def update(ss, metadata: VideoMetadata):
-    result = ss["query_result"]
-    frame_result, count = qr.group_occurence(result)
+    frame_result, count = qr.group_occurence(
+        ss["query_result"]
+    )
 
-    result = np.array(metadata.map_indices(frame_result))
-    st.write(result)
+    result = np.array(
+        metadata.map_indices(frame_result)
+    )
     result[:, 0] = count.astype(int)
 
+    result = sorted(
+        result,
+        key=lambda x: x[0],
+        reverse=True
+    )
+
     ss["page_num"] = 0
-    if ss["fetch_nearby"] != 0:
-        result = qr.get_nearby(
-            result,
-            ss["fetch_nearby"],
-            metadata.frame_index
-        )
 
     match ss["group_input"]:
         case None:
             result = [["", result]]
-        case "Confident":
-            result = qr.group_by_occurence(result)
         case "Video":
             result = qr.group_by_video(result)
 
@@ -35,7 +35,7 @@ def update(ss, metadata: VideoMetadata):
 def gadget(ss, metadata):
     ss["group_input"] = st.selectbox(
         "Group method",
-        (None, "Video", "Confident")
+        (None, "Video", "Occurence")
     )
     ss["fetch_nearby"] = st.slider(
         "Fetch nearby frame",

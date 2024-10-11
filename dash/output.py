@@ -1,6 +1,8 @@
 import streamlit as st
 import dash.gadget as gd
 import db
+import query_result as qr
+from db import VideoMetadata
 
 ss = st.session_state
 
@@ -10,38 +12,46 @@ def youtube_popup(url, start_time):
     st.video(url, start_time=start_time)
 
 
+@st.dialog("Nearby frame", width="large")
+def nearby_popup(
+        f,
+        metadata: VideoMetadata,
+        set_name,
+        vid_name,
+        fps
+):
+    flist = qr.get_nearby(f, ss["fetch_nearby"], metadata.nearby_index)
+
+    with st.container(border=True):
+        f = flist[0]
+        gd.display_img_nearby(f, fps, set_name, vid_name)
+
+    cols = st.columns(2)
+    for i, f in enumerate(flist[1:]):
+        with cols[i % 2]:
+            gd.display_img_nearby(f, fps, set_name, vid_name)
+
+
 def show_result(results,
                 container,
                 metadata: db.VideoMetadata,
-                keyframes_dir: str,
                 columns=4):
     with container:
         # stinky hack for button key
         kidx = 0
 
-        youtube_url = f"https://youtu.be"
         for group in results:
             div = st.expander(label=str(group[0]), expanded=True)
 
             cols = div.columns(columns)
             for ci, f in enumerate(group[1]):
                 with cols[ci % columns]:
-                    vid_name = f"L{f[2]:02d}_V{f[3]:03d}"
-                    set_name = f"Videos_L{f[2]:02d}_a"
 
-                    fps, youtube_id = metadata.get_by_name(vid_name)
-
-                    time = int(f[4]/fps)
-                    url = f"{youtube_url}/{youtube_id}"
-
-                    path = f"{keyframes_dir}/{set_name}/{vid_name}/{f[4]:06d}.jpg"
-                    gd.display_image(
+                    gd.display_image_full(
                         f,
-                        vid_name,
-                        path,
-                        time,
-                        url,
+                        metadata,
                         youtube_popup,
+                        nearby_popup,
                         kidx
                     )
 

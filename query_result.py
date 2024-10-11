@@ -1,4 +1,5 @@
 import numpy as np
+import streamlit as st
 
 
 def group_by_video(results):
@@ -40,30 +41,62 @@ def group_by_occurence(results) -> dict:
     )
 
 
-def get_nearby(results,
+def get_nearby(f,
                k,
-               frame_index_list):
+               nearby_index_list):
     output = list()
+    output.append([
+        f[0],
+        f[1],
+        f[2],
+        f[3],
+        f[4],
+        True
+    ])
 
-    for f in results:
-        flist = frame_index_list[f[2]-1][f[3]-1]
+    if k == 0:
+        return output
 
-        for i in range(-k, k+1):
-            index = f[1] + i
-            try:
-                output.append([
-                    f[0],
-                    index,
-                    f[2],
-                    f[3],
-                    flist[index]
-                ])
-            except:
-                pass
+    nearby_list = nearby_index_list[f[2]-1][f[3]-1]
+    cf_index = f[1]
+
+    left_bound = max(
+        0,
+        cf_index - k
+    )
+    right_bound = min(
+        len(nearby_list)-1,
+        cf_index + k
+    )
+
+    for l in range(left_bound, cf_index):
+        f = [
+            f[0],
+            l,
+            f[2],
+            f[3],
+            nearby_list[l],
+            False
+        ]
+        if f not in output:
+            output.append(f)
+
+    for r in range(cf_index+1, right_bound+1):
+        f = [
+            f[0],
+            r,
+            f[2],
+            f[3],
+            nearby_list[r],
+            False
+        ]
+        output.append(f)
+
     return output
 
 
 def paging(results, k):
+    #
     i = 0
     output = []
 

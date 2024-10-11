@@ -21,30 +21,17 @@ st.set_page_config(
 ss = st.session_state
 
 
-def create_answer_table():
-    ss["answer_table"] = pd.DataFrame(
-        columns=["Video", "Index"]
-    )
-
-    ss["answer_table_final"] = pd.DataFrame(
-        columns=["Video", "Frames"]
-    )
-
-
 if "query_result" not in ss:
     ss["query_result"] = None
     ss["result"] = [[]]
     ss["page_num"] = 0
 
 
-if "answer_table" not in ss:
-    create_answer_table()
-
 if "max_result" not in ss:
     ss["max_result"] = 100
 
-
-keyframes_dir = "./keyframes"
+if "kf_dir" not in ss:
+    ss["kf_dir"] = "./keyframes"
 
 
 @st.cache_resource
@@ -151,28 +138,9 @@ with st.sidebar:
         dash.sidebar.output.gadget(ss, metadata)
     with tabs[2]:
         st.write("vo dc vong sau r lam")
-    #     st.button(
-    #         "Reset table",
-    #         on_click=create_answer_table
-    #     )
-    #     st.download_button(
-    #         label="Download data as CSV",
-    #         data=ss["answer_table_final"].to_csv(
-    #             header=False,
-    #             index=False
-    #         ),
-    #         mime="text/csv",
-    #     )
-    #     ss["answer_table_final"] = st.data_editor(
-    #         ss["answer_table"],
-    #         use_container_width=True,
-    #         num_rows="dynamic"
-    #     )
 
 
 results_container = st.container()
-# with results_container:
-#     ss["result"][ss["page_num"]]
 
 ss["page_num"] = max(0, ss["page_num"])
 
@@ -180,6 +148,5 @@ dash.output.show_result(
     ss["result"][ss["page_num"]],
     results_container,
     metadata,
-    keyframes_dir,
     ss["display_columns"]
 )
