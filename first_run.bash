@@ -1,9 +1,12 @@
 #!/bin/bash
+
+echo "Install debian packages"
+apt update 
+apt -y install wget git
+
 echo "Install pip packages"
-
-pip install -r requirements.txt --progress-bar on -q
-
 pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cpu
+pip install -r requirements.txt --progress-bar on
 
 echo "Download LongCLIP"
 git submodule update --init --recursive

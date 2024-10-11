@@ -33,7 +33,7 @@ if "kf_dir" not in ss:
     ss["kf_dir"] = "./keyframes"
 
 if "llm_endpoint" not in ss:
-    ss["llm_endpoint"] = "http://0.0.0.0:11434/api/chat "
+    ss["llm_endpoint"] = "http://0.0.0.0:11434/api/chat"
 
 
 @st.cache_resource
