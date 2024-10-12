@@ -1,7 +1,6 @@
 #!/bin/bash
 
 echo "Setup directory"
-mkdir -p /{keyframes,db}
 
 ln -sf /db /workdir/db
 ln -sf /keyframes /workdir/keyframes

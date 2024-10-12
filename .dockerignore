@@ -1,8 +1,8 @@
 __pycache__
-ckpt/*
-db/*
-keyframes/*
-metadata/*
+ckpt
+db
+keyframes
+metadata
 Dockerfile
 README.md
 first_run.ps1

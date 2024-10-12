@@ -8,3 +8,4 @@ RUN ./first_run_docker.bash
 EXPOSE 8502
 
 CMD ["streamlit","run","dashboard.py"]
+# CMD ["ls","/workdir/keyframes"]

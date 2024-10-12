@@ -12,13 +12,19 @@ Chu?a test tren Windows
 3. Extract set 1, set 2 vao' **keyframes**
 4. Extract DB vao' **db**
 
+Le^.nh chay. dashboard
+```bash
+streamlit run dashboard.py
+```
 ## Docker
 1. Extract all keyframes into **./keyframes**
 2. Extract **DB** into ./db
 ### Without Ollama
-
-
-Le^.nh chay. dashboard
+1. Build docker image
 ```bash
-streamlit run dashboard.py
+docker build . --tag potasium:hcm_ai_dashboard
+```
+2. Run docker image
+```bash
+docker run --name hcm_ai_dashboard -p 8502:8502 -v ./keyframes:/keyframes -v ./db:/db potasium:hcm_ai_dashboard
 ```
