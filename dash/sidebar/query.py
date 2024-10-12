@@ -4,7 +4,6 @@ from prompt import Prompt
 
 @st.fragment
 def gadget(ss,
-           translator,
            search):
 
     prompt_input = st.text_area("Prompt")
@@ -16,11 +15,6 @@ def gadget(ss,
     cols = st.columns(2)
 
     with cols[0]:
-        translate_prompt = st.toggle(
-            "Translate",
-            value=True
-        )
-
         tokenize_input = st.toggle("Tokenize")
 
     with cols[1]:
@@ -39,13 +33,7 @@ def gadget(ss,
             value=False
         )
 
-    ss["prompt"] = Prompt(text=prompt_input, translator=translator)
-
-    if translate_prompt:
-        try:
-            ss["prompt"].translate()
-        except:
-            pass
+    ss["prompt"] = Prompt(text=prompt_input)
 
     if tokenize_input:
         ss["token_sentence"] = ss["prompt"].tokenize()

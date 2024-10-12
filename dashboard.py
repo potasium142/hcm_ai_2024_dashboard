@@ -6,7 +6,6 @@ import dash.sidebar.output
 import dash.sidebar.query
 import dash.output
 import db
-import googletrans
 import dash
 import openclip_model
 import numpy as np
@@ -19,7 +18,8 @@ st.set_page_config(
 
 ss = st.session_state
 
-
+if "llm_endpoint" not in ss:
+    ss["llm_endpoint"] = "http://0.0.0.0:11434/api/chat"
 if "query_result" not in ss:
     ss["query_result"] = None
     ss["result"] = [[]]
@@ -32,8 +32,9 @@ if "max_result" not in ss:
 if "kf_dir" not in ss:
     ss["kf_dir"] = "./keyframes"
 
-if "llm_endpoint" not in ss:
-    ss["llm_endpoint"] = "http://0.0.0.0:11434/api/chat "
+
+if "messages" not in ss:
+    ss["messages"] = []
 
 
 @st.cache_resource
@@ -74,17 +75,16 @@ def init_openclip(show_spinner=True):
 @st.cache_resource
 def init_miscelleneous(show_spinner=True):
 
-    translator = googletrans.Translator()
     video_metadata = db.VideoMetadata(
         "./db/video_metadata.npy",
         "./db/index_frame.pkl",
         "./db/index_compact_2.npy"
     )
 
-    return translator, video_metadata
+    return video_metadata
 
 
-translator, metadata = init_miscelleneous()
+metadata = init_miscelleneous()
 
 longclip_model, db_longclip = init_longclip()
 
@@ -135,7 +135,7 @@ with st.sidebar:
 
     tabs = st.tabs(["Query", "Output"])
     with tabs[0]:
-        dash.sidebar.query.gadget(ss, translator, search)
+        dash.sidebar.query.gadget(ss,  search)
     with tabs[1]:
         dash.sidebar.output.gadget(ss, metadata)
 

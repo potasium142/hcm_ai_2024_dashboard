@@ -3,16 +3,13 @@ import requests
 import json
 
 ss = st.session_state
-if "messages" not in ss:
-    ss["messages"] = []
-
 MSG_TEMPLATE = {
     "model": "llama2",
     "messages": [{
         "role": "user",
         "content": ""
     }],
-    "stream": False
+    "stream": True
 }
 
 
@@ -23,13 +20,14 @@ def update_endpoint(endpoint: str):
 def sent_chat(msg):
     msg_dict = MSG_TEMPLATE.copy()
     msg_dict["messages"][0]["content"] = msg
-
     r = requests.post(
-        "http://0.0.0.0:11434/api/chat",
+        ss["llm_endpoint"],
         json=msg_dict,
-        stream=False
+        stream=True
     )
-    return r.json()["message"]
+    for msg in r.iter_lines():
+        if msg:
+            yield json.loads(msg)["message"]["content"]
 
 
 def llm_chat(container):
@@ -49,13 +47,15 @@ def llm_chat(container):
 
         messages_container = st.container(height=300)
 
-        prompt = st.chat_input()
-
-        if prompt:
-            ss["messages"].append({"role": "user", "content": prompt})
-
-            chat_output = sent_chat(prompt)
-            ss["messages"].append(chat_output)
-
         for msg in ss["messages"]:
             messages_container.chat_message(msg["role"]).write(msg["content"])
+
+        if prompt := st.chat_input():
+            ss["messages"].append({"role": "user", "content": prompt})
+
+            messages_container.chat_message("user").write(prompt)
+
+            with messages_container.chat_message("assistant"):
+                stream = sent_chat(prompt)
+                response = st.write_stream(stream)
+            ss["messages"].append({"role": "assistant", "content": response})
