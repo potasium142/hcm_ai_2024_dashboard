@@ -2,6 +2,7 @@ import streamlit as st
 import query_result as qr
 import numpy as np
 from db import VideoMetadata
+import pickle
 
 
 def update(ss, metadata: VideoMetadata):

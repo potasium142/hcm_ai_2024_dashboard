@@ -96,42 +96,35 @@ def get_nearby(f,
 
 
 def paging(results, k):
-    #
-    i = 0
     output = []
+    size_left = k
+    cb = []
 
-    f_page = []
     for b in results:
-        f = b[1]
-        bin_size = len(f)
+        bin_len = len(b[1])
 
-        remain_size = k - i
+        if (bin_len > size_left):
+            if size_left != k:
+                output.append(cb)
 
-        if bin_size < remain_size:
-            i = i+bin_size
-            f_page.append([b[0], f])
+                size_left = k
+                cb = []
+
+        if bin_len <= size_left:
+            cb.append([b[0], b[1]])
+            size_left -= bin_len
             continue
+        else:
+            split_chunk, _ = divmod(bin_len, k)
 
-        f_page.append([b[0], f[:remain_size]])
+            for j in range(split_chunk+1):
+                start_range = j * k
 
-        output.append(f_page)
-        f_page = []
+                splited_bin = [[b[0], b[1][start_range:start_range+k]]]
+                output.append(splited_bin)
 
-        new_bin = f[remain_size:]
-
-        split_chunk, i_a = divmod(len(new_bin), k)
-
-        for j in range(split_chunk+1):
-            start_range = i + k*(j)
-            end_range = i+k*(j+1)
-            f_page.append([b[0], new_bin[start_range: end_range]])
-
-            output.append(f_page)
-            f_page = []
-
-        i = i_a
-
-    if len(f_page) > 0:
-        output.append(f_page)
+            size_left = k
+    if cb:
+        output.append(cb)
 
     return output

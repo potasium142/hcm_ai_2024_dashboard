@@ -39,7 +39,6 @@ def show_result(results,
     with container:
         # stinky hack for button key
         kidx = 0
-
         for group in results:
             div = st.expander(label=str(group[0]), expanded=True)
 
