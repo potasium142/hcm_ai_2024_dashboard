@@ -4,7 +4,7 @@ import os
 import json
 import pickle
 
-indexes = np.load("./db/index_compact.npy")
+indexes = np.load("./db/index_compact_2.npy")
 
 
 def decode(index_compact):

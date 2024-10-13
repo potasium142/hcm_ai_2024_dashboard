@@ -36,6 +36,7 @@ def show_result(results,
                 container,
                 metadata: db.VideoMetadata,
                 columns=4):
+
     with container:
         # stinky hack for button key
         kidx = 0
