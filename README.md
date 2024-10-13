@@ -13,6 +13,7 @@ Chu?a test tren Windows
 
 > [!IMPORTANT]  
 > 3 CLIP models are about 15gb in size
+> 
 > For some reason, the progress bar for OpenCLIP downloading process no longer showup
 
 ### Local
