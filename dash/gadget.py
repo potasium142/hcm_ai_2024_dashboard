@@ -10,6 +10,7 @@ def display_image_full(
         metadata,
         youtube_popup_callback,
         nearby_popup_callback,
+        search_nearby_callback,
         kidx,
 ):
     vid_name = f"L{f[2]:02d}_V{f[3]:03d}"
@@ -39,7 +40,7 @@ def display_image_full(
             language="markdown"
         )
 
-        cols = st.columns(2)
+        cols = st.columns(3)
         cols[0].button(
             label="YouTube Video",
             use_container_width=True,
@@ -52,6 +53,13 @@ def display_image_full(
             on_click=nearby_popup_callback,
             args=(f, metadata, set_name, vid_name, fps),
             key=f"{kidx}1"
+        )
+        cols[2].button(
+            label="Search similiar",
+            use_container_width=True,
+            on_click=search_nearby_callback,
+            args=(path,),
+            key=f"{kidx}2"
         )
     return container
 

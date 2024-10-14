@@ -93,7 +93,7 @@ metaclip_model, db_metaclip = init_metaclip()
 openclip_model, db_openclip = init_openclip()
 
 
-def search():
+def search_text():
     texts = ss["search_query"]
     results = []
     if ss["query_longclip"]:
@@ -127,6 +127,39 @@ def search():
     dash.sidebar.output.update(ss, metadata)
 
 
+def search_image(image_path):
+    results = []
+    if ss["query_longclip"]:
+        longclip_token = longclip_model.encode_image(image_path)
+        results.append(
+            db_longclip.query(
+                longclip_token,
+                ss["max_result"]
+            )
+        )
+
+    if ss["query_metaclip"]:
+        metaclip_token = metaclip_model.encode_image(image_path)
+        results.append(
+            db_metaclip.query(
+                metaclip_token,
+                ss["max_result"]
+            )
+        )
+
+    if ss["query_openclip"]:
+        openclip_token = openclip_model.encode_image(image_path)
+        results.append(
+            db_openclip.query(
+                openclip_token,
+                ss["max_result"]
+            )
+        )
+
+    ss["query_result"] = np.concatenate(results)
+    dash.sidebar.output.update(ss, metadata)
+
+
 with st.sidebar:
     if len(ss["result"]) > 1:
         dash.sidebar.paging.paging()
@@ -135,7 +168,7 @@ with st.sidebar:
 
     tabs = st.tabs(["Query", "Output"])
     with tabs[0]:
-        dash.sidebar.query.gadget(ss,  search)
+        dash.sidebar.query.gadget(ss,  search_text)
     with tabs[1]:
         dash.sidebar.output.gadget(ss, metadata)
 
@@ -151,6 +184,7 @@ dash.output.show_result(
     ss["result"][ss["page_num"]],
     results_container,
     metadata,
+    search_image,
     ss["display_columns"]
 )
 

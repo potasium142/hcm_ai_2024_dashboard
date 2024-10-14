@@ -41,7 +41,8 @@ def gadget(ss, metadata):
     ss["fetch_nearby"] = st.slider(
         "Fetch nearby frame",
         min_value=0,
-        max_value=10
+        max_value=30,
+        value=5
     )
 
     ss["display_columns"] = st.slider(

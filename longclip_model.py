@@ -1,4 +1,5 @@
 from longclip.model import longclip
+from PIL import Image
 import numpy as np
 import torch
 
@@ -8,7 +9,7 @@ class LongCLIPModel():
                  ckpt_path: str,
                  device: str = "cpu") -> None:
         self.device = self.__get_device(device)
-        self.ckpt = self.__eval_model(ckpt_path)
+        self.ckpt, self.preprocess = self.__eval_model(ckpt_path)
 
     def __get_device(self,
                      device: str):
@@ -26,9 +27,9 @@ class LongCLIPModel():
 
     def __eval_model(self,
                      path: str):
-        model, _ = longclip.load(path, device=self.device)
+        model, preprocess = longclip.load(path, device=self.device)
         model.eval()
-        return model
+        return model, preprocess
 
     def encode_text(self,
                     search_text: str | list[str]) -> np.ndarray:
@@ -44,3 +45,16 @@ class LongCLIPModel():
         text_features /= text_features.norm(dim=-1, keepdim=True)
 
         return text_features.numpy()
+
+    def encode_image(self,
+                     image_path: str) -> np.ndarray:
+        image = self.preprocess(Image.open(image_path)).unsqueeze(0)
+
+        with torch.no_grad():
+            image_features = self.ckpt\
+                .encode_image(image)\
+                .float()
+
+        image_features /= image_features.norm(dim=-1, keepdim=True)
+
+        return image_features.numpy()

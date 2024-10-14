@@ -35,6 +35,7 @@ def nearby_popup(
 def show_result(results,
                 container,
                 metadata: db.VideoMetadata,
+                image_search_callback,
                 columns=4):
 
     with container:
@@ -52,6 +53,7 @@ def show_result(results,
                         metadata,
                         youtube_popup,
                         nearby_popup,
+                        image_search_callback,
                         kidx
                     )
 
