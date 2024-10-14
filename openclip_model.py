@@ -59,7 +59,7 @@ class OpenCLIP():
         image = self.preprocess(Image.open(image_path)).unsqueeze(0)
 
         with torch.no_grad():
-            image_features = self.ckpt\
+            image_features = self.model\
                 .encode_image(image)\
                 .float()
 

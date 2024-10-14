@@ -6,13 +6,15 @@ import pickle
 
 
 def update(ss, metadata: VideoMetadata):
+
     frame_result, count = qr.group_occurence(
-        ss["query_result"]
+        ss["history"][ss["history_num"]]
     )
 
     result = np.array(
         metadata.map_indices(frame_result)
     )
+
     result[:, 0] = count.astype(int)
 
     result = sorted(
@@ -20,8 +22,6 @@ def update(ss, metadata: VideoMetadata):
         key=lambda x: x[0],
         reverse=True
     )
-
-    ss["page_num"] = 0
 
     match ss["group_input"]:
         case None:

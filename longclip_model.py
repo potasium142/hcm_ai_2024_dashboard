@@ -9,7 +9,7 @@ class LongCLIPModel():
                  ckpt_path: str,
                  device: str = "cpu") -> None:
         self.device = self.__get_device(device)
-        self.ckpt, self.preprocess = self.__eval_model(ckpt_path)
+        self.model, self.preprocess = self.__eval_model(ckpt_path)
 
     def __get_device(self,
                      device: str):
@@ -38,7 +38,7 @@ class LongCLIPModel():
             .to(self.device)
 
         with torch.no_grad():
-            text_features = self.ckpt\
+            text_features = self.model\
                 .encode_text(text_tokens)\
                 .float()
 
@@ -51,7 +51,7 @@ class LongCLIPModel():
         image = self.preprocess(Image.open(image_path)).unsqueeze(0)
 
         with torch.no_grad():
-            image_features = self.ckpt\
+            image_features = self.model\
                 .encode_image(image)\
                 .float()
 

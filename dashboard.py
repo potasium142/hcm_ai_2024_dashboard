@@ -22,8 +22,10 @@ if "llm_endpoint" not in ss:
     ss["llm_endpoint"] = "http://0.0.0.0:11434/api/chat"
 if "query_result" not in ss:
     ss["query_result"] = None
+    ss["history"] = [[]]
     ss["result"] = [[]]
     ss["page_num"] = 0
+    ss["history_num"] = 0
 
 
 if "max_result" not in ss:
@@ -123,7 +125,9 @@ def search_text():
             )
         )
 
-    ss["query_result"] = np.concatenate(results)
+    ss["page_num"] = 0
+    ss["history_num"] = len(ss["history"])
+    ss["history"].append(np.concatenate(results))
     dash.sidebar.output.update(ss, metadata)
 
 
@@ -156,11 +160,15 @@ def search_image(image_path):
             )
         )
 
-    ss["query_result"] = np.concatenate(results)
+    ss["page_num"] = 0
+    ss["history_num"] = len(ss["history"])
+    ss["history"].append(np.concatenate(results))
     dash.sidebar.output.update(ss, metadata)
 
 
 with st.sidebar:
+    if len(ss["history"]) > 2:
+        dash.sidebar.paging.history(dash.sidebar.output.update(ss, metadata))
     if len(ss["result"]) > 1:
         dash.sidebar.paging.paging()
     else:
