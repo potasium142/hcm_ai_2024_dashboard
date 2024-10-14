@@ -9,6 +9,8 @@ import db
 import dash
 import openclip_model
 import numpy as np
+import os
+os.environ["KMP_DUPLICATE_LIB_OK"] = "TRUE"
 
 st.set_page_config(
     page_title="Video search dashboard",
@@ -54,7 +56,7 @@ def init_longclip(show_spinner=True):
 def init_metaclip(show_spinner=True):
     model = openclip_model.OpenCLIP(
         "ViT-L-14-quickgelu",
-        "metaclip_fullcc"
+        "./ckpt/l14_400m.pt"
     )
     db_metaclip = db.DB(
         "./db/faiss_MetaCLIP.bin",
@@ -66,7 +68,7 @@ def init_metaclip(show_spinner=True):
 def init_openclip(show_spinner=True):
     model = openclip_model.OpenCLIP(
         "ViT-H-14-quickgelu",
-        "dfn5b"
+        "./ckpt/dfn5b_vit_h_14.bin"
     )
     db_metaclip = db.DB(
         "./db/faiss_openCLIP.bin",
