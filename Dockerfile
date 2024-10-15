@@ -13,7 +13,6 @@ RUN wget -q "https://dl.fbaipublicfiles.com/MMPT/metaclip/l14_400m.pt" -P "./ckp
 RUN wget -q "https://huggingface.co/apple/DFN5B-CLIP-ViT-H-14/resolve/main/open_clip_pytorch_model.bin?download=true" -O "./ckpt/dfn5b_vit_h_14.bin"
 
 RUN ./first_run_docker.bash
-RUN ./first_run.bash
 
 EXPOSE 8502
 
