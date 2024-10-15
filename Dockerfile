@@ -5,7 +5,7 @@ WORKDIR /workdir
 VOLUME [ "/db","/keyframes" ]
 
 COPY . .
-
+RUN apt update && apt -y install wget git
 RUN wget -q --show-progress "https://huggingface.co/BeichenZhang/LongCLIP-L/resolve/main/longclip-L.pt" -P "./ckpt"
 
 RUN wget -q --show-progress "https://dl.fbaipublicfiles.com/MMPT/metaclip/l14_400m.pt" -P "./ckpt"
