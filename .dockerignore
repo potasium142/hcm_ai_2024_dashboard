@@ -10,4 +10,3 @@ first_run.ps1
 docker*
 .gitignore
 .github
-.git
