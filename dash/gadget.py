@@ -36,7 +36,7 @@ def display_image_full(
         )
 
         st.code(
-            f"{vid_name}, {f[4]}",
+            f"{vid_name}, {time*1000}",
             language="markdown"
         )
 
@@ -86,7 +86,7 @@ def display_img_nearby(
         )
 
         st.code(
-            f"{vid_name}, {f[4]}",
+            f"{vid_name}, {time * 1000}",
             language="markdown"
         )
     pass
